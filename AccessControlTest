@@ -1,1 +1,105 @@
 
+
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+
+contract AccessControlTest is AccessControl{
+
+ //声明对应角色
+ /*
+keccak256 是一种加密哈希算法，广泛应用于以太坊等区块链平台。
+它将任意长度的输入数据转换为固定长度的 256-bit（32字节）哈希值。
+keccak256 是单向的，即从哈希值无法反推原始数据，这使得它非常适合用于数据完整性验证和防篡改。
+它被广泛用于签名验证、生成唯一标识符、保证区块链数据的不可篡改性等方面。
+keccak256 是区块链中不可或缺的核心工具，了解它的原理和应用可以帮助你更好地理解区块链的安全机制。
+
+AccessControl 是 OpenZeppelin 提供的一个合约，旨在简化和实现基于角色的权限管理。它允许你在合约中设置不同的权限角色，并控制哪些用户可以执行哪些操作
+
+
+grantRole(ADMIN_ROLE, adminAddress);
+
+
+revokeRole(ADMIN_ROLE, adminAddress);
+
+
+renounceRole(bytes32 role, address account)
+描述：让 account 地址主动放弃其角色 role。
+用法：当某个地址不再需要某个角色的权限时，它可以自愿放弃该角色。
+注意：该操作是不可撤销的，即一旦放弃，地址就无法再拥有该角色，除非有其他角色再次授予它。
+
+hasRole(bytes32 role, address account)
+描述：检查 account 地址是否拥有指定的角色 role。
+用法：通常在函数中进行权限验证时使用，检查某个地址是否具备某个角色的权限。
+
+
+getRoleAdmin(bytes32 role)
+描述：返回某个角色的管理角色。即谁可以授予或撤销该角色。
+用法：每个角色都有一个管理角色，管理角色拥有授予和撤销该角色的权限。
+
+
+setRoleAdmin(bytes32 role, bytes32 adminRole)
+描述：设置某个角色的管理角色为 adminRole。
+用法：管理员可以调整角色的管理权限，这样就能更灵活地控制角色的管理。
+
+
+onlyRole(bytes32 role)
+描述：这是一个修饰符，用来限制某些函数只能由特定角色的用户执行。
+用法：onlyRole 修饰符确保只有拥有特定角色的地址才能执行该函数。例如，只有 ADMIN_ROLE 的用户才能执行某些管理操作。
+
+require(condition, "message") 确保条件满足，否则回滚交易。
+用于验证输入、权限、状态变量等，确保智能合约安全性。
+如果 require 失败，消耗的 gas 也会部分返还，但 assert 失败则会消耗所有 gas。
+
+
+关键字	适用场景	                     失败后果	退还 Gas
+require	用户输入检查、权限检查、余额检查	回滚交易	 是
+assert	内部逻辑检查（如数学运算溢出）	    回滚交易	 否（消耗所有 Gas）
+revert	手动回滚交易（更复杂的错误处理）	回滚交易	  是
+ */
+
+bytes32 public constant ANMINROLE = keccak256("ADMINROLE");
+bytes32 public constant OPERATEROLE = keccak256("OPERATEROLE");
+
+constructor(){
+
+    _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); //这句话不加编译不过 
+    grantRole(ANMINROLE,msg.sender); 
+   _setRoleAdmin(OPERATEROLE, ANMINROLE);  //每个角色都要指定管理者 有管理者分配角色给地址 
+}
+
+function addOperaterole(address account) public  onlyRole(ANMINROLE){
+
+    grantRole(OPERATEROLE, account);
+}
+
+function removeOperaterole(address account) public  onlyRole(ANMINROLE){
+    revokeRole(OPERATEROLE, account);
+}
+
+// 只有拥有OPERATEROLE 角色权限的地址才能调用操作这个函数
+function operateAsk() public  onlyRole(OPERATEROLE) view returns (uint256){
+   
+   return 2;
+}
+
+
+function operateAsk2() public pure  returns (uint256){
+   
+   return 2;
+}
+
+
+//修改管理员地址
+function changeAdmin(address account) public onlyRole(ANMINROLE){
+     revokeRole(ANMINROLE, msg.sender);
+     //require(hasRole(ANMINROLE, account)==false, "HAS READY ANMINROLE");
+     grantRole(ANMINROLE, account);
+}
+
+
+
+
+
+}
