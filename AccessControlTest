@@ -64,7 +64,7 @@ bytes32 public constant OPERATEROLE = keccak256("OPERATEROLE");
 
 constructor(){
 
-    _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); //这句话不加编译不过 
+    _grantRole(DEFAULT_ADMIN_ROLE, msg.sender); //这句话不加部署交易失败 
     grantRole(ANMINROLE,msg.sender); 
    _setRoleAdmin(OPERATEROLE, ANMINROLE);  //每个角色都要指定管理者 有管理者分配角色给地址 
 }
